@@ -1,12 +1,14 @@
-<form action="/store" method="post" enctype="multipart/form-data">
-    <label for="txt_name">Nombre</label>
-    <input type="text" name="txt_name" id="txt_name">
-<br>
-    <label for="txt_email">Email</label>
-    <input type="email" name="txt_email" id="txt_email">
-<br>
-    <label for="txt_picture">Foto</label>
-    <input type="file" name="txt_picture" id="txt_picture">
-<br>
-    <input type="submit" value="Agregar nuevo empleado">
-</form>
+{% include 'header.html' %}
+    <form action="/store" method="post" enctype="multipart/form-data">
+        <label for="txt_name">Nombre</label>
+        <input type="text" name="txt_name" id="txt_name">
+        <br>
+        <label for="txt_email">Email</label>
+        <input type="email" name="txt_email" id="txt_email">
+        <br>
+        <label for="txt_picture">Foto</label>
+        <input type="file" name="txt_picture" id="txt_picture">
+        <br>
+        <input type="submit" value="Agregar nuevo empleado">
+    </form>
+{% include 'footer.html' %}
