@@ -1,0 +1,31 @@
+    {% include 'header.html' %}
+    
+        <h1>hola bruno</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Foto</th>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- MUESTRA LOS EMPLEADOS REGISTRADOS EN LA BSE DE DATOS -->
+                {% for emp in empleado %}
+                <tr>
+                    <td>{{emp[0]}}</td>
+                    <td>{{emp[3]}}</td>
+                    <td>{{emp[1]}}</td>
+                    <td>{{emp[2]}}</td>
+                    <td>
+                        <a href="/modify/{{emp[0]}}">Editar</a>
+                        |
+                        <a href="/delete/{{emp[0]}}">Borrar</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    {% include 'footer.html' %}
