@@ -46,6 +46,16 @@ def store():
     _correo = request.form['txt_email']
     _foto = request.files['txt_picture']
 
+    now = datetime.now()
+    print(now)
+    timee = now.strftime("%Y%H%M%S")
+    print(timee)
+
+    if _foto.filename != '':
+        new_name_pic = timee + '_' + _foto.filename
+        _foto.save("src/uploads/" + new_name_pic)
+
+
     sql = "INSERT INTO empleados (nombre, correo, foto) values (%s, %s, %s);"
     datos = (_nombre, _correo, _foto.filename)
 
