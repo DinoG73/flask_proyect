@@ -52,7 +52,7 @@ def store():
     print(timee)
 
     if _foto.filename != '':
-        new_name_pic = timee + '_' + _foto.filename
+        new_name_pic = timee + '_' + _foto.filename # Esta linea marca un error o advertencia en vs code, todavia no deduzco de que se trata
         _foto.save("src/uploads/" + new_name_pic)
 
 
