@@ -1,6 +1,8 @@
 from flask import Flask
 from flask import render_template, request, redirect
 from flaskext.mysql import MySQL
+import time
+from datetime import datetime
 
 
 app = Flask(__name__)
