@@ -15,7 +15,7 @@ app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = ''
 app.config['MYSQL_DATABASE_DB'] = 'empleados'
 
-UPLOADS = os.path.join('uploads')
+UPLOADS = os.path.join('src/uploads/')
 app.config['UPLOADS'] = UPLOADS
 
 mysql.init_app(app)
@@ -55,11 +55,11 @@ def store():
 
     if _foto.filename != '':
         new_name_pic = timee + '_' + _foto.filename # Esta linea marca un error o advertencia en vs code, todavia no deduzco de que se trata
-        _foto.save("src/uploads/" + new_name_pic)
-
+        _foto.save('src/uploads/' + new_name_pic)
+        print(new_name_pic)
 
     sql = "INSERT INTO empleados (nombre, correo, foto) values (%s, %s, %s);"
-    datos = (_nombre, _correo, _foto.filename)
+    datos = (_nombre, _correo, new_name_pic)
 
     conn = mysql.connect()
     cursor = conn.cursor()
@@ -71,13 +71,23 @@ def store():
 
 @app.route('/delete/<int:id>')
 def delete(id):
-    print('hola')
-    sql = "DELETE FROM  empleados WHERE id=%s"
-    # sql = f'DELETE FROM  empleados WHERE id={id}'
+    #print('hola')
     conn = mysql.connect()
     cursor = conn.cursor()
-    cursor.execute(sql, id)
-    # cursor.execute(sql)
+
+    sql = f'SELECT foto FROM empleados WHERE id="{id}";'
+    cursor.execute(sql)
+    nombre_foto = cursor.fetchone()[0]
+    print(nombre_foto)
+    try:
+        os.remove(os.path.join(app.config['UPLOADS'], nombre_foto))
+    except:
+        pass
+
+    #sql = "DELETE FROM  empleados WHERE id=%s"
+    sql = f'DELETE FROM  empleados WHERE id="{id}";'
+    #cursor.execute(sql, id)
+    cursor.execute(sql)
     conn.commit()
 
     return redirect('/')
@@ -85,10 +95,10 @@ def delete(id):
 
 @app.route('/modify/<int:id>')
 def modify(id):
-    print(id)
-    sql = f"SELECT * FROM empleados WHERE id={id}"
+    #print(id)
     conn = mysql.connect()
     cursor = conn.cursor()
+    sql = f'SELECT * FROM empleados WHERE id="{id}";'
     cursor.execute(sql)
     empleado = cursor.fetchone()
     conn.commit()
@@ -102,35 +112,41 @@ def update():
     _foto = request.files['txt_picture']
     id = request.form['txt_id']
 
-    datos = (_nombre, _correo, id)
-
+   #datos = (_nombre, _correo, id)
     conn = mysql.connect()
     cursor = conn.cursor()
-
-   
 
     if _foto.filename != '':
         now = datetime.now()
         timee = now.strftime("%Y%H%M%S")
-        new_name_pic = timee + '_' + _foto.filename # Esta linea marca un error o advertencia en vs code, todavia no deduzco de que se trata
-        _foto.save("src/uploads/" + new_name_pic)
+        new_name_pic = timee + '_' + str(_foto.filename) # Esta linea marca un error o advertencia en vs code, todavia no deduzco de que se trata
+        _foto.save('src/uploads/' + new_name_pic)
 
+        sql = f'SELECT foto FROM empleados WHERE id="{id}";'
+        cursor.execute(sql)
+        conn.commit()
 
-    sql = f'SELECT foto FROM empleados WHERE id={id}'
-    cursor.execute(sql)
+        nombre_foto = cursor.fetchone()[0]
+        print(nombre_foto)
+        borrar_foto = os.path.join(app.config['UPLOADS'], nombre_foto)
+        print(borrar_foto)
+        
+        try:
+            os.remove(os.path.join(app.config['UPLOADS'], nombre_foto))
+        except:
+            pass
 
-    nombre_foto = cursor.fetchone()[0]
-
-    os.remove(os.path.join(app.config['UPLOADS'], nombre_foto))
-
-    #datos = (_nombre, _correo, _foto.filename)
-
-    # conn = mysql.connect()
-    # cursor = conn.cursor()
-
-    sql = f'UPDATE empleados SET nombre={_nombre}, correo={_correo} WHERE id={id}'
+        sql = f'UPDATE empleados SET foto="{new_name_pic}" WHERE id="{id}";'
+        cursor.execute(sql)
+        conn.commit()
+        
+        
+        
+    sql = f'UPDATE empleados SET nombre="{_nombre}", correo="{_correo}" WHERE id="{id}";'
     cursor.execute(sql)
     conn.commit()
+
+    return redirect('/')
 
 
 
