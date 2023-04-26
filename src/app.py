@@ -1,7 +1,6 @@
-from flask import Flask
-from flask import render_template, request, redirect
+from flask import Flask, render_template, request, redirect, url_for, send_from_directory
 from flaskext.mysql import MySQL
-import time
+#import time
 from datetime import datetime
 import os
 
@@ -19,6 +18,19 @@ UPLOADS = os.path.join('src/uploads/')
 app.config['UPLOADS'] = UPLOADS
 
 mysql.init_app(app)
+
+conn = mysql.connect()
+cursor = conn.cursor()
+
+
+def queryMySql(query, data = ()):
+    if len(data) > 0:
+        cursor.execute(query, data)
+    else:
+        cursor.execute(query)
+    conn.commit()
+    
+
 
 #from app import routes
 @app.route('/')
@@ -54,11 +66,11 @@ def store():
     print(timee)
 
     if _foto.filename != '':
-        new_name_pic = timee + '_' + _foto.filename # Esta linea marca un error o advertencia en vs code, todavia no deduzco de que se trata
+        new_name_pic = timee + '_' + str(_foto.filename) # Esta linea marca un error o advertencia en vs code, todavia no deduzco de que se trata
         _foto.save('src/uploads/' + new_name_pic)
         print(new_name_pic)
 
-    sql = "INSERT INTO empleados (nombre, correo, foto) values (%s, %s, %s);"
+    sql = "INSERT INTO empleados (nombre, correo, foto) values (%s, %s, %s);" #convertir las sentencias sql a este formato para evitar sqlinjection
     datos = (_nombre, _correo, new_name_pic)
 
     conn = mysql.connect()
@@ -68,7 +80,12 @@ def store():
 
     return redirect('/')
 
+#Esta ruta es para la tabla del index, me muestra la foto de perfil que cargo el usuario
+@app.route('/fotoperfil/<path:new_name_pic>')
+def uploadfoto(new_name_pic):
+    return send_from_directory(os.path.join('uploads'), new_name_pic)
 
+# Ruta para borrar la foto de perfil, se llama desde el boton borrar desde el archivo index
 @app.route('/delete/<int:id>')
 def delete(id):
     #print('hola')
@@ -140,15 +157,13 @@ def update():
         cursor.execute(sql)
         conn.commit()
         
-        
-        
+            
     sql = f'UPDATE empleados SET nombre="{_nombre}", correo="{_correo}" WHERE id="{id}";'
+    print(sql)
     cursor.execute(sql)
     conn.commit()
 
     return redirect('/')
-
-
 
 
 
